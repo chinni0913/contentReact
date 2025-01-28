@@ -4,6 +4,7 @@ import './Cards.css';
 const Cards = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // new loading state
 
   useEffect(() => {
     fetch('https://www.reddit.com/r/reactjs.json')
@@ -15,20 +16,31 @@ const Cards = () => {
       })
       .then(data => {
         setPosts(data.data.children.map(child => child.data));
+        setIsLoading(false); // stop loading after data is fetched
       })
       .catch(err => {
         setError(err.message);
+        setIsLoading(false); // stop loading if there's an error
       });
   }, []);
 
   return (
     <div className="container">
       <h1>Posts</h1>
-      {error && (
+      
+      {/* Show loading spinner or message */}
+      {isLoading && (
+        <div className="loader">
+          {/* <p>Loading...</p> */}
+        </div>
+      )}
+
+      {error && !isLoading && (
         <div className="error-message" style={{ color: 'red', padding: '10px', backgroundColor: '#fdd' }}>
           <strong>Error:</strong> {error}
         </div>
       )}
+
       <div className="cards">
         {posts.map((post, index) => (
           <div className="card" key={index}>
